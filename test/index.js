@@ -1852,6 +1852,21 @@ describe("model validation on delete (default): { validateBeforeDelete: true }",
             });
         });
     });
+
+    it("restore() -> should raise ValidationError error", function (done) {
+        TestModel.findOne({ name: 'Luke Skywalker' }, function (err, luke) {
+            should.not.exist(err);
+            luke.name = "";
+
+            luke.restore(function (err) {
+                err.should.exist;
+                err.name.should.exist;
+                err.name.should.equal('ValidationError');
+                done();
+            });
+        });
+    });
+
 });
 
 describe("model validation on delete: { validateBeforeDelete: false }", function () {
@@ -1890,6 +1905,18 @@ describe("model validation on delete: { validateBeforeDelete: false }", function
             luke.name = "Test Name";
 
             luke.delete(function (err) {
+                should.not.exist(err);
+                done();
+            });
+        });
+    });
+
+    it("restore() -> not raise ValidationError error", function (done) {
+        TestModel.findOne({ name: 'Luke Skywalker' }, function (err, luke) {
+            should.not.exist(err);
+            luke.name = "";
+
+            luke.restore(function (err) {
                 should.not.exist(err);
                 done();
             });
